@@ -7,12 +7,18 @@ use Illuminate\Http\Request;
 
 class ProfessorController extends Controller
 {
+
+    public function  __construct(Professor $professor){
+        $this->professor = $professor;
+    }
+    
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        $professor = $this->professor::all();
+        return response()->json($professor, 200);
     }
 
     /**
@@ -28,16 +34,23 @@ class ProfessorController extends Controller
      */
     public function store(Request $request)
     {
-        $professor = Professor::create($request->all());
-        return $professor;
+        $request->validate($this->professor->rules(), $this->professor->feedback());
+
+        $professor = $this->professor::create($request->all());
+        return response()->json($professor, 201);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Professor $professor)
+    public function show($id)
     {
-        //
+        $professor = $this->professor::find($id);
+
+        if ($professor === null) 
+            return response()->json(['erro' => 'Recurso pesquisado não existe'], 404);
+
+        return response()->json($professor, 200);
     }
 
     /**
@@ -51,16 +64,31 @@ class ProfessorController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Professor $professor)
+    public function update(Request $request, $id)
     {
-        //
+        $professor = $this->professor::find($id);
+
+        if ($professor === null) 
+            return response()->json(['erro' => 'Não foi possível atualizar! Recurso não existe'], 404);
+
+        $request->validate($this->professor->rules(), $this->professor->feedback());
+
+
+        $professor->update($request->all());
+        return response()->json($professor, 200);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Professor $professor)
+    public function destroy($id)
     {
-        //
+        $professor = $this->professor::find($id);
+
+        if ($professor === null) 
+            return response()->json(['erro' => 'Não foi possível deletar! Recurso não existe'], 404);
+
+        $professor->delete();
+        return response()->json(['message' => 'Professor deletado com sucesso!'], 200);
     }
 }
