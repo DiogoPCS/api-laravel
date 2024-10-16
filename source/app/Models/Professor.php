@@ -16,6 +16,7 @@ class Professor extends Model
             'nome' => 'required',
             'email' => 'required|email',
             'telefone' => 'required',
+            'foto' => 'required|file|mimes:jpeg,jpg,png'
         ];
 
         return $regras;
@@ -25,6 +26,8 @@ class Professor extends Model
         $feedback = [
             'required' => 'O campo :attribute é obrigatório',
             'email' => 'O campo :attribute deve ser um e-mail válido',
+            'foto.required' => 'É necessário enviar uma foto',
+            'foto.mimes' => 'O arquivo enviado não é uma foto',
         ];
 
         return $feedback;

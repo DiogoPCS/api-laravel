@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Professor;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ProfessorController extends Controller
 {
@@ -36,8 +37,13 @@ class ProfessorController extends Controller
     {
         $request->validate($this->professor->rules(), $this->professor->feedback());
 
-        $professor = $this->professor::create($request->all());
-        return response()->json($professor, 201);
+        $this->professor->nome = $request->nome;
+        $this->professor->email = $request->email;
+        $this->professor->telefone = $request->telefone;
+        $this->professor->foto = $request->file('foto')->store('public');
+        $this->professor->save();
+
+        return response()->json($this->professor, 201);
     }
 
     /**
@@ -89,6 +95,7 @@ class ProfessorController extends Controller
             return response()->json(['erro' => 'Não foi possível deletar! Recurso não existe'], 404);
 
         $professor->delete();
+        Storage::delete($professor->foto);
         return response()->json(['message' => 'Professor deletado com sucesso!'], 200);
     }
 }
